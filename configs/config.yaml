@@ -1,0 +1,14 @@
+azure:
+  client_id: "YOUR-CLIENT-ID"
+  tenant_id: "YOUR-TENANT-ID"
+
+status:
+  template: "🎵 {{.Name}} – {{.Artist}}"
+  expiry_minutes: 10
+  clear_on_pause: true
+  timezone: "W. Europe Standard Time"
+
+behavior:
+  debounce_seconds: 10
+  log_level: "info"
+  # log_file: "~/Library/Logs/teams-music.log"
