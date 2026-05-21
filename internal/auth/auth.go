@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -52,14 +53,28 @@ func NewTokenManager(cfg AzureConfig, tokenPath string, logger *slog.Logger) *To
 	}
 }
 
+// oidcScopes are standard OIDC scopes that must not be prefixed with the Graph base URL.
+var oidcScopes = map[string]bool{
+	"offline_access": true,
+	"openid":         true,
+	"profile":        true,
+	"email":          true,
+}
+
 // scopeString returns scopes as a space-separated string for token requests.
+// OIDC scopes (offline_access, openid, …) are sent as-is; all others are
+// prefixed with the Microsoft Graph base URL.
 func (tm *TokenManager) scopeString() string {
 	s := ""
 	for i, sc := range tm.cfg.Scopes {
 		if i > 0 {
 			s += " "
 		}
-		s += "https://graph.microsoft.com/" + sc
+		if oidcScopes[sc] || strings.HasPrefix(sc, "https://") {
+			s += sc
+		} else {
+			s += "https://graph.microsoft.com/" + sc
+		}
 	}
 	return s
 }
